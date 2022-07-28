@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const PORT = process.env.port || 3001;
-const termData = require('./db/db.json');
+let termData = require('./db/db.json');
 const app = express();
 
 app.use(express.json());
@@ -19,16 +19,43 @@ app.post('/api/notes',(req,res) =>{
     let newNote = req.body;
     let noteList = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
 
+    let id = 1;
+
+    for(let i =0; i< termData.length;i++){
+        let eachNote = termData[i];
+
+        if(eachNote.id > id){
+            id = eachNote.id;
+        }
+    }
+    newNote.id = id + 1;
+
     noteList.push(newNote);
     fs.writeFileSync("./db/db.json", JSON.stringify(noteList));
     res.json(termData);
     console.log("POST");
+    termData = noteList;
+    console.log("Your note was saved!");
 });
-app.get('/api/notes',(req,res)=>{
-    res.json(termData);
-});
-// remove notes 
 
+// remove notes 
+app.delete('/api/notes/:id',(req,res) =>{
+    console.log("Remove Post");
+    let noteList = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    console.log(noteList);
+    for(let i =0; i< noteList.length;i++){
+
+        if(noteList[i].id == req.params.id){
+            noteList.splice(i,i);
+            break;
+        }
+    }
+    console.log(noteList);
+    fs.writeFileSync("./db/db.json", JSON.stringify(noteList));
+    
+    res.json(req.body);
+    console.log("Remove");
+});
 //when user clicks on one of the notes it gets the notes 
 
 //get the index.html
