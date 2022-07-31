@@ -11,7 +11,8 @@ app.use(express.static("public"));
 
 // get notes
 app.get('/api/notes',(req,res)=>{
-    res.json(termData);
+    let noteList = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    res.json(noteList);
 });
 
 // add notes
@@ -33,7 +34,6 @@ app.post('/api/notes',(req,res) =>{
     noteList.push(newNote);
     fs.writeFileSync("./db/db.json", JSON.stringify(noteList));
     res.json(termData);
-    console.log("POST");
     termData = noteList;
     console.log("Your note was saved!");
 });
@@ -42,19 +42,15 @@ app.post('/api/notes',(req,res) =>{
 app.delete('/api/notes/:id',(req,res) =>{
     console.log("Remove Post");
     let noteList = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
-    console.log(noteList);
     for(let i =0; i< noteList.length;i++){
 
         if(noteList[i].id == req.params.id){
-            noteList.splice(i,i);
+            noteList.splice(i,1);
             break;
         }
     }
-    console.log(noteList);
-    fs.writeFileSync("./db/db.json", JSON.stringify(noteList));
-    
+    fs.writeFileSync("./db/db.json", JSON.stringify(noteList));    
     res.json(req.body);
-    console.log("Remove");
 });
 //when user clicks on one of the notes it gets the notes 
 
